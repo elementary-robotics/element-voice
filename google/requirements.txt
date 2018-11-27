@@ -1,0 +1,4 @@
+requests
+google.auth
+google-assistant-library
+google-assistant-sdk
