@@ -1,4 +1,5 @@
 requests
-google.auth
+google-auth
+google-auth-oauthlib[tool]
 google-assistant-library
 google-assistant-sdk

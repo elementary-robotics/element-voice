@@ -22,9 +22,11 @@ services:
         target: /shared
         volume:
           nocopy: true
+      - "/home/dan/ER/repos/element-voice:/development"
     depends_on:
       - "nucleus"
     command: tail -f /dev/null
+    privileged: true
 
 volumes:
   shared:
