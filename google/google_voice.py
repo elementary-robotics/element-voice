@@ -37,8 +37,6 @@ def process_event(event, assistant, element):
     # Always print the event
     print(event)
 
-
-
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter)
