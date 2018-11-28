@@ -14,7 +14,7 @@ jobs:
 
       # Info on where to push the build in Dockerhub
       DOCKERHUB_ORG: elementaryrobotics
-      DOCKERHUB_REPO: elment-voice
+      DOCKERHUB_REPO: element-voice
 
       # Name of the service in docker-compose.yml
       DOCKER_COMPOSE_PROJECT_NAME: voice
