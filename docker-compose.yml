@@ -12,7 +12,7 @@ services:
           nocopy: true
     command: ./launch.sh
 
-  element:
+  voice:
     build:
       context: .
       dockerfile: Dockerfile
