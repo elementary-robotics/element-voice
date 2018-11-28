@@ -12,4 +12,6 @@ publish all strings on a stream named `strings`.
 When the element is launched without overriding the command it will
 boot up and immediately begin publishing text strings to
 `stream:voice:string`. All users can read on this stream and react to
-voice commands as they please.
+voice commands as they please. On this stream there will be a single
+key, `data` which will contain the speech-to-text translation from
+the running voice interpreter
