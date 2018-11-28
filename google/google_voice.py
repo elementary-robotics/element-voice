@@ -29,7 +29,7 @@ def process_event(event, assistant, element):
         speech_text = event.args["text"]
 
         # Write the entry
-        element.entry_write("string", {"d" : speech_text})
+        element.entry_write("string", {"data" : speech_text})
 
         # Stop the conversation
         assistant.stop_conversation()
