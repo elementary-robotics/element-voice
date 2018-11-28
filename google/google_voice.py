@@ -15,25 +15,29 @@ from google.assistant.library import Assistant
 from google.assistant.library.event import EventType
 from google.assistant.library.file_helpers import existing_file
 
-def process_event(event, assistant):
-    """Pretty prints events.
+from atom import Element
 
-    Prints all events that occur with two spaces between each new
-    conversation and a single space between turns of a conversation.
-
-    Args:
-        event(event.Event): The current event to process.
-        device_id(str): The device ID of the new instance.
+def process_event(event, assistant, element):
     """
-    if event.type == EventType.ON_CONVERSATION_TURN_STARTED:
-        print("start")
+    Publishes the event on our data stream
+    """
 
+    # If speech finished, then we want to publish the string
+    if (event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED):
+
+        # Get the text and publish it
+        speech_text = event.args["text"]
+
+        # Write the entry
+        element.entry_write("string", {"d" : speech_text})
+
+        # Stop the conversation
+        assistant.stop_conversation()
+
+    # Always print the event
     print(event)
 
-    if (event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED):
-        speech_text = event.args["text"]
-        print("speech text: " + speech_text)
-        assistant.stop_conversation()
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -63,13 +67,15 @@ def main():
                                                             **json.load(f))
 
     with Assistant(credentials, args.device_model_id) as assistant:
+
+        # Create our element
+        element = Element("voice")
+
+        # Start the assistant
         events = assistant.start()
 
-        print('device_model_id:', args.device_model_id + '\n' +
-              'device_id:', assistant.device_id + '\n')
-
         for event in events:
-            process_event(event, assistant)
+            process_event(event, assistant, element)
 
 if __name__ == '__main__':
     main()
