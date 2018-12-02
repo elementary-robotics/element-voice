@@ -14,6 +14,10 @@ ADD . /code
 WORKDIR /code/google
 RUN pip3 install -r requirements.txt
 
+# Install the sounds
+WORKDIR /code
+RUN mkdir /usr/local/share/sounds
+RUN cp sounds/* /usr/local/share/sounds
 
 # Here, we'll build and install the code s.t. our launch script,
 #	now located at /code/launch.sh, will launch our element/app

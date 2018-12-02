@@ -15,12 +15,17 @@ from google.assistant.library import Assistant
 from google.assistant.library.event import EventType
 from google.assistant.library.file_helpers import existing_file
 
+import pygame
+
 from atom import Element
 
-def process_event(event, assistant, element):
+def process_event(event, assistant, element, sound_start):
     """
     Publishes the event on our data stream
     """
+
+    if event.type == EventType.ON_CONVERSATION_TURN_STARTED:
+        sound_start.play()
 
     # If speech finished, then we want to publish the string
     if (event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED):
@@ -64,6 +69,10 @@ def main():
         credentials = google.oauth2.credentials.Credentials(token=None,
                                                             **json.load(f))
 
+    # Set up the sound playback
+    pygame.init()
+    sound_start = pygame.mixer.Sound("/usr/local/share/sounds/on_conversation_start.wav")
+
     with Assistant(credentials, args.device_model_id) as assistant:
 
         # Create our element
@@ -73,7 +82,7 @@ def main():
         events = assistant.start()
 
         for event in events:
-            process_event(event, assistant, element)
+            process_event(event, assistant, element, sound_start)
 
 if __name__ == '__main__':
     main()
