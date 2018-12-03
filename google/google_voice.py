@@ -16,7 +16,8 @@ from google.assistant.library.event import EventType
 from google.assistant.library.file_helpers import existing_file
 
 from multiprocessing import Process, Queue
-import pygame
+import os
+import subprocess
 
 from atom import Element
 from atom.messages import Response
@@ -29,11 +30,11 @@ class Sounds(object):
         self.sounds = {}
 
     def load_sound(self, name, filename):
-        self.sounds[name] = pygame.mixer.Sound(filename)
+        self.sounds[name] = filename
 
     def play_sound(self, name):
         if name in self.sounds:
-            self.sounds[name].play()
+            subprocess.call(["play", self.sounds[name]])
             print ("Played sound {}".format(name))
             return True
         else:
@@ -69,7 +70,6 @@ def sound_playback_thread(sound_queue):
     """
     Load the sounds and handle the queue to play them
     """
-    pygame.init()
 
     sounds = Sounds()
     sounds.load_sound("success", "/usr/local/share/sounds/success.wav")
