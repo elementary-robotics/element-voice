@@ -72,7 +72,7 @@ def sound_playback_thread(sound_queue):
     pygame.init()
 
     sounds = Sounds()
-    #sounds.load_sound("success", "/usr/local/share/sounds/success.mp3")
+    sounds.load_sound("success", "/usr/local/share/sounds/success.wav")
     sounds.load_sound("fail", "/usr/local/share/sounds/fail.wav")
     sounds.load_sound("on_start", "/usr/local/share/sounds/on_conversation_start.wav")
 
