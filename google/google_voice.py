@@ -15,17 +15,81 @@ from google.assistant.library import Assistant
 from google.assistant.library.event import EventType
 from google.assistant.library.file_helpers import existing_file
 
-import pygame
+from multiprocessing import Process, Queue
+import os
+import subprocess
 
 from atom import Element
+from atom.messages import Response
 
-def process_event(event, assistant, element, sound_start):
+class Sounds(object):
+    """
+    Class that plays all sounds
+    """
+    def __init__(self):
+        self.sounds = {}
+
+    def load_sound(self, name, filename):
+        self.sounds[name] = filename
+
+    def play_sound(self, name):
+        if name in self.sounds:
+            subprocess.call(["play", self.sounds[name]])
+            print ("Played sound {}".format(name))
+            return True
+        else:
+            print("Sound {} not supported!".format(name))
+            return False
+
+class SoundElement(object):
+    """
+    Element for playing back sounds
+    """
+    def __init__(self, queue):
+        self.q = queue
+
+    def command_cb(self, data):
+        self.q.put(data.decode('ascii'))
+        return Response(data="Success")
+
+def sound_element_thread(sound_queue):
+    """
+    Registers all of the sound playback commands for this element
+    and handles when they're called
+    """
+
+    elem = Element("sound")
+
+    # Register our callback to play sounds
+    elem_class = SoundElement(sound_queue)
+    elem.command_add("play_sound", elem_class.command_cb)
+    elem.command_loop()
+
+
+def sound_playback_thread(sound_queue):
+    """
+    Load the sounds and handle the queue to play them
+    """
+
+    sounds = Sounds()
+    sounds.load_sound("success", "/usr/local/share/sounds/success.wav")
+    sounds.load_sound("fail", "/usr/local/share/sounds/fail.wav")
+    sounds.load_sound("on_start", "/usr/local/share/sounds/on_conversation_start.wav")
+
+    # Loop, reading from the queue and playing sounds
+    while True:
+
+        sound = sound_queue.get()
+        sounds.play_sound(sound)
+
+
+def process_event(event, assistant, element, sound_queue):
     """
     Publishes the event on our data stream
     """
 
     if event.type == EventType.ON_CONVERSATION_TURN_STARTED:
-        sound_start.play()
+        sound_queue.put("on_start")
 
     # If speech finished, then we want to publish the string
     if (event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED):
@@ -69,9 +133,16 @@ def main():
         credentials = google.oauth2.credentials.Credentials(token=None,
                                                             **json.load(f))
 
-    # Set up the sound playback
-    pygame.init()
-    sound_start = pygame.mixer.Sound("/usr/local/share/sounds/on_conversation_start.wav")
+    # Set up the sound thread
+    sound_queue = Queue()
+    sound_thread = Process(target=sound_playback_thread, args=(sound_queue,))
+    sound_thread.start()
+
+    # Set up the process that will play sounds for other processes. This
+    #   is needed until we get a shared PulseAudio system up and running
+    #   s.t. all elements can play their own sounds
+    sound_element = Process(target=sound_element_thread, args=(sound_queue,))
+    sound_element.start()
 
     with Assistant(credentials, args.device_model_id) as assistant:
 
@@ -82,7 +153,7 @@ def main():
         events = assistant.start()
 
         for event in events:
-            process_event(event, assistant, element, sound_start)
+            process_event(event, assistant, element, sound_queue)
 
 if __name__ == '__main__':
     main()
