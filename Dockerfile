@@ -5,6 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 #
 # Apt-get installs
 #
+RUN apt-get update
 RUN apt-get install -y portaudio19-dev libffi-dev libssl-dev libmpg123-dev sox libsox-fmt-all
 
 # Want to copy over the contents of this repo to the code
