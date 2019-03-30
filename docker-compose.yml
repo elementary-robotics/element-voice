@@ -3,6 +3,7 @@ version: "3.2"
 services:
 
   nucleus:
+    container_name: nucleus
     image: elementaryrobotics/nucleus
     volumes:
       - type: volume
@@ -13,6 +14,7 @@ services:
     command: ./launch.sh
 
   voice:
+    container_name: voice
     build:
       context: .
       dockerfile: Dockerfile
@@ -22,9 +24,11 @@ services:
         target: /shared
         volume:
           nocopy: true
-      - "/home/dan/ER/repos/element-voice:/development"
+      - "~/google_voice/credential.json:/code/google/credential.json"
     depends_on:
       - "nucleus"
+    environment:
+      - "DEVICE_MODEL_ID=SOME_DEVICE_MODEL_ID"
     privileged: true
 
 volumes:
