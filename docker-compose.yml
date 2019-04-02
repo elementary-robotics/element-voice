@@ -24,12 +24,13 @@ services:
         target: /shared
         volume:
           nocopy: true
-      - "~/google_voice/credential.json:/code/google/credential.json"
+      - "~/google_voice/credentials.json:/code/google/credentials.json"
     depends_on:
       - "nucleus"
     environment:
       - "DEVICE_MODEL_ID=SOME_DEVICE_MODEL_ID"
     privileged: true
+
 
 volumes:
   shared:
